@@ -9,5 +9,7 @@ abstract class PredictionRemoteDataSource {
   Future<PredictionResponse> predictHealthData(HealthDataModel healthData);
   Future<PredictionResponse> predictAnemiaImage(File imageFile);
   Future<PredictionResponse> predictAnemiaSurvey(Map<String, dynamic> surveyData);
+  Future<PredictionResponse> predictSkinCancerImage(File imageFile);
+  Future<PredictionResponse> predictSkinCancerSurvey(Map<String, dynamic> surveyData);
   Future<TextPredictionResponse> predictFromText(String text);
 }

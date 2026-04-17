@@ -27,6 +27,17 @@ abstract class RegisterModule {
       Dio(BaseOptions(baseUrl: Constants().anemiaSurveyBaseUrl, receiveDataWhenStatusError: true));
 
   @singleton
+  @Named('SkinCancerDio')
+  Dio get skincancerDio =>
+      Dio(BaseOptions(baseUrl: Constants().skincancerBaseUrl, receiveDataWhenStatusError: true));
+
+  @singleton
+  @Named('SkinCancerSurveyDio')
+  Dio get skincancerSurveyDio => Dio(
+    BaseOptions(baseUrl: Constants().skincancerSurveyBaseUrl, receiveDataWhenStatusError: true),
+  );
+
+  @singleton
   @Named('TextPredictDio')
   Dio get textPredictDio =>
       Dio(BaseOptions(baseUrl: Constants().textPredictBaseUrl, receiveDataWhenStatusError: true));

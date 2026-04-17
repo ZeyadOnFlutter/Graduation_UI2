@@ -6,6 +6,24 @@ class PredictionResponse {
   final String message;
 
   factory PredictionResponse.fromJson(Map<String, dynamic> json) {
+    // Skin cancer survey API: {risk_level, probabilities: {Low Risk, Moderate Risk, High Risk}}
+    if (json.containsKey('risk_level') && json.containsKey('probabilities')) {
+      final probs = json['probabilities'] as Map<String, dynamic>;
+      final highRisk = (probs['High Risk'] as num?)?.toDouble() ?? 0.0;
+      final modRisk = (probs['Moderate Risk'] as num?)?.toDouble() ?? 0.0;
+      final riskScore = (highRisk + modRisk * 0.5) / 100.0;
+      final riskLevel = json['risk_level'] as String? ?? '';
+      final msg = riskLevel == 'High Risk'
+          ? 'Multiple risk factors detected — please consult a doctor soon'
+          : riskLevel == 'Moderate Risk'
+              ? 'Some risk factors are present — consider seeing a dermatologist'
+              : 'Your responses suggest a low likelihood of skin cancer risk';
+      return PredictionResponse(
+        prediction: riskLevel,
+        probability: riskScore.clamp(0.0, 1.0),
+        message: msg,
+      );
+    }
     // Diabetes image API: {prediction, confidence_percentage}
     if (json.containsKey('confidence_percentage')) {
       final confidence = (json['confidence_percentage'] as num).toDouble() / 100.0;

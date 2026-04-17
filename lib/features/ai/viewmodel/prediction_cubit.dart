@@ -72,6 +72,21 @@ class PredictionCubit extends Cubit<PredictionState> {
     );
   }
 
+  Future<void> predictSkinCancerSurvey(Map<String, dynamic> surveyData) async {
+    emit(PredictionLoading());
+    final response = await _repository.predictSkinCancerSurvey(surveyData);
+    response.fold(
+      (failure) => emit(PredictionError(failure.message)),
+      (predictionResponse) => emit(
+        PredictionSuccess(
+          predictionResponse.prediction,
+          probability: predictionResponse.probability,
+          message: predictionResponse.message,
+        ),
+      ),
+    );
+  }
+
   Future<void> predictFromText(String text) async {
     emit(PredictionLoading());
     final response = await _repository.predictFromText(text);
@@ -93,10 +108,14 @@ class PredictionCubit extends Cubit<PredictionState> {
     try {
       final imgFuture = disease == 'Anemia'
           ? _repository.predictAnemiaImage(imageFile, imageFile.path)
-          : _repository.predictImage(imageFile, imageFile.path);
+          : disease == 'Skin Cancer'
+              ? _repository.predictSkinCancerImage(imageFile, imageFile.path)
+              : _repository.predictImage(imageFile, imageFile.path);
       final surveyFuture = disease == 'Anemia'
           ? _repository.predictAnemiaSurvey(surveyData)
-          : _repository.predictHealthData(HealthDataModel.fromJson(surveyData));
+          : disease == 'Skin Cancer'
+              ? _repository.predictSkinCancerSurvey(surveyData)
+              : _repository.predictHealthData(HealthDataModel.fromJson(surveyData));
       final nlpFuture = _repository.predictFromText(symptomText);
 
       final imgResp = await imgFuture;

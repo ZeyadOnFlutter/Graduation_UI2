@@ -14,6 +14,8 @@ class PredictionApiDataSource implements PredictionRemoteDataSource {
   final Dio _predictDio;
   final Dio _anemiaDio;
   final Dio _anemiaSurveyDio;
+  final Dio _skinCancerDio;
+  final Dio _skinCancerSurveyDio;
   final Dio _textPredictDio;
 
   PredictionApiDataSource(
@@ -21,6 +23,8 @@ class PredictionApiDataSource implements PredictionRemoteDataSource {
     @Named('PredictDio') this._predictDio,
     @Named('AnemiaDio') this._anemiaDio,
     @Named('AnemiaSurveyDio') this._anemiaSurveyDio,
+    @Named('SkinCancerDio') this._skinCancerDio,
+    @Named('SkinCancerSurveyDio') this._skinCancerSurveyDio,
     @Named('TextPredictDio') this._textPredictDio,
   );
 
@@ -78,6 +82,34 @@ class PredictionApiDataSource implements PredictionRemoteDataSource {
         data: surveyData,
       );
       print('Anemia Survey Response: ${response.data}');
+      return PredictionResponse.fromJson(response.data);
+    } on DioException catch (e) {
+      throw ApiErrorHandler.handleDioError(e);
+    }
+  }
+
+  @override
+  Future<PredictionResponse> predictSkinCancerImage(File imageFile) async {
+    try {
+      final formData = FormData.fromMap({
+        'file': await MultipartFile.fromFile(imageFile.path, filename: 'image.jpg'),
+      });
+      final response = await _skinCancerDio.post(ApiEndpoints.skinCancerPredict, data: formData);
+      print('Skin Cancer Image Response: ${response.data}');
+      return PredictionResponse.fromJson(response.data);
+    } on DioException catch (e) {
+      throw ApiErrorHandler.handleDioError(e);
+    }
+  }
+
+  @override
+  Future<PredictionResponse> predictSkinCancerSurvey(Map<String, dynamic> surveyData) async {
+    try {
+      final response = await _skinCancerSurveyDio.post(
+        ApiEndpoints.skinCancerSurveyPredict,
+        data: surveyData,
+      );
+      print('Skin Cancer Survey Response: ${response.data}');
       return PredictionResponse.fromJson(response.data);
     } on DioException catch (e) {
       throw ApiErrorHandler.handleDioError(e);

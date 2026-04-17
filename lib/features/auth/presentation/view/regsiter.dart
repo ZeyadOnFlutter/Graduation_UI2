@@ -81,11 +81,12 @@ class _RegisterState extends State<Register> {
             builder: (_) => const Center(child: CircularProgressIndicator()),
           );
         } else if (state is AuthError) {
-          Navigator.of(context).popUntil((r) => r.isFirst);
+          if (Navigator.of(context).canPop()) Navigator.of(context).pop();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(state.message), backgroundColor: Colors.red),
           );
         } else if (state is Authenticated) {
+          if (Navigator.of(context).canPop()) Navigator.of(context).pop();
           Navigator.of(context).popUntil((r) => r.isFirst);
         }
       },

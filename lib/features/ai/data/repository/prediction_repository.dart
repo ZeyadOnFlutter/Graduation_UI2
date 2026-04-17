@@ -101,6 +101,29 @@ class PredictionRepository {
     }
   }
 
+  Future<Either<Failure, PredictionResponse>> predictSkinCancerImage(
+    File imageFile,
+    String imageUrl,
+  ) async {
+    try {
+      final response = await _dataSource.predictSkinCancerImage(imageFile);
+      return Right(response);
+    } on RemoteException catch (e) {
+      return Left(Failure(e.message));
+    }
+  }
+
+  Future<Either<Failure, PredictionResponse>> predictSkinCancerSurvey(
+    Map<String, dynamic> surveyData,
+  ) async {
+    try {
+      final response = await _dataSource.predictSkinCancerSurvey(surveyData);
+      return Right(response);
+    } on RemoteException catch (e) {
+      return Left(Failure(e.message));
+    }
+  }
+
   Future<Either<Failure, TextPredictionResponse>> predictFromText(String text) async {
     try {
       final response = await _dataSource.predictFromText(text);

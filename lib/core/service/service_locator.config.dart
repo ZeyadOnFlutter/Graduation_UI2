@@ -74,8 +74,16 @@ extension GetItInjectableX on _i174.GetIt {
       ),
     );
     gh.singleton<_i361.Dio>(
+      () => registerModule.skincancerSurveyDio,
+      instanceName: 'SkinCancerSurveyDio',
+    );
+    gh.singleton<_i361.Dio>(
       () => registerModule.anemiaDio,
       instanceName: 'AnemiaDio',
+    );
+    gh.singleton<_i361.Dio>(
+      () => registerModule.skincancerDio,
+      instanceName: 'SkinCancerDio',
     );
     gh.lazySingleton<_i237.AdminDataSource>(
       () => _i237.AdminDataSource(
@@ -83,27 +91,22 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i59.FirebaseAuth>(),
       ),
     );
+    gh.lazySingleton<_i977.AuthRepository>(
+      () => _i319.AuthRepositoryImpl(gh<_i911.FirebaseAuthDataSource>()),
+    );
+    gh.lazySingleton<_i750.AdminCubit>(
+      () => _i750.AdminCubit(gh<_i237.AdminDataSource>()),
+    );
     gh.lazySingleton<_i383.PredictionRemoteDataSource>(
       () => _i732.PredictionApiDataSource(
         gh<_i361.Dio>(instanceName: 'MainDio'),
         gh<_i361.Dio>(instanceName: 'PredictDio'),
         gh<_i361.Dio>(instanceName: 'AnemiaDio'),
         gh<_i361.Dio>(instanceName: 'AnemiaSurveyDio'),
+        gh<_i361.Dio>(instanceName: 'SkinCancerDio'),
+        gh<_i361.Dio>(instanceName: 'SkinCancerSurveyDio'),
         gh<_i361.Dio>(instanceName: 'TextPredictDio'),
       ),
-    );
-    gh.lazySingleton<_i977.AuthRepository>(
-      () => _i319.AuthRepositoryImpl(gh<_i911.FirebaseAuthDataSource>()),
-    );
-    gh.lazySingleton<_i366.PredictionRepository>(
-      () => _i366.PredictionRepository(
-        gh<_i383.PredictionRemoteDataSource>(),
-        gh<_i911.FirebaseAuthDataSource>(),
-        gh<_i59.FirebaseAuth>(),
-      ),
-    );
-    gh.lazySingleton<_i750.AdminCubit>(
-      () => _i750.AdminCubit(gh<_i237.AdminDataSource>()),
     );
     gh.lazySingleton<_i159.LoginUseCase>(
       () => _i159.LoginUseCase(gh<_i977.AuthRepository>()),
@@ -114,8 +117,12 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i996.RegisterUseCase>(
       () => _i996.RegisterUseCase(gh<_i977.AuthRepository>()),
     );
-    gh.lazySingleton<_i529.PredictionCubit>(
-      () => _i529.PredictionCubit(gh<_i366.PredictionRepository>()),
+    gh.lazySingleton<_i366.PredictionRepository>(
+      () => _i366.PredictionRepository(
+        gh<_i383.PredictionRemoteDataSource>(),
+        gh<_i911.FirebaseAuthDataSource>(),
+        gh<_i59.FirebaseAuth>(),
+      ),
     );
     gh.singleton<_i823.AuthCubit>(
       () => _i823.AuthCubit(
@@ -123,6 +130,9 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i996.RegisterUseCase>(),
         gh<_i445.LogoutUseCase>(),
       ),
+    );
+    gh.lazySingleton<_i529.PredictionCubit>(
+      () => _i529.PredictionCubit(gh<_i366.PredictionRepository>()),
     );
     return this;
   }

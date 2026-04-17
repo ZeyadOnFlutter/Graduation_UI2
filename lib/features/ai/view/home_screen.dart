@@ -7,12 +7,11 @@ import '../../auth/presentation/cubit/auth_state.dart';
 import '../widgets/category_card.dart';
 import 'diabetes_analysis_screen.dart';
 import 'anemia_analysis_screen.dart';
+import 'skin_cancer_analysis_screen.dart';
 import '../../clinical_guidance/view/guidance_detail_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -112,7 +111,11 @@ class HomeScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Icon(Icons.health_and_safety_rounded, size: 80.sp, color: Colors.white.withOpacity(0.25)),
+                  Icon(
+                    Icons.health_and_safety_rounded,
+                    size: 80.sp,
+                    color: Colors.white.withOpacity(0.25),
+                  ),
                 ],
               ),
             ),
@@ -120,7 +123,10 @@ class HomeScreen extends StatelessWidget {
             SizedBox(height: 30.h),
 
             // ── Detection Categories ────────────────────────────────
-            _SectionHeader(title: 'Detection Categories', subtitle: 'Select a condition to analyze'),
+            _SectionHeader(
+              title: 'Detection Categories',
+              subtitle: 'Select a condition to analyze',
+            ),
             SizedBox(height: 14.h),
 
             GridView.count(
@@ -153,6 +159,18 @@ class HomeScreen extends StatelessWidget {
                     name: 'Diabetes',
                     color: Colors.blueAccent,
                     subtitle: 'Tongue · Survey · Symptoms',
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const SkinCancerAnalysisScreen()),
+                  ),
+                  child: const CategoryCard(
+                    icon: '🔆',
+                    name: 'Skin Cancer',
+                    color: Color(0xFF6A1B9A),
+                    subtitle: 'Skin · Survey · Symptoms',
                   ),
                 ),
               ],
@@ -192,6 +210,26 @@ class HomeScreen extends StatelessWidget {
               ],
             ),
 
+            SizedBox(height: 12.h),
+
+            Row(
+              children: [
+                Expanded(
+                  child: _GuidanceCard(
+                    label: 'Skin Cancer',
+                    icon: '🔆',
+                    color: const Color(0xFF6A1B9A),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const GuidanceDetailScreen(type: 'skin_cancer'),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
             SizedBox(height: 30.h),
           ],
         ),
@@ -216,9 +254,15 @@ class _SectionHeader extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.bold)),
+            Text(
+              title,
+              style: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.bold),
+            ),
             SizedBox(height: 2.h),
-            Text(subtitle, style: TextStyle(fontSize: 12.sp, color: Colors.grey)),
+            Text(
+              subtitle,
+              style: TextStyle(fontSize: 12.sp, color: Colors.grey),
+            ),
           ],
         ),
       ],
