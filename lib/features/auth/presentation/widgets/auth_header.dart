@@ -15,14 +15,7 @@ class AuthHeader extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Image.asset(
-          'assets/images/running.png',
-          width: 70.w,
-          height: 70.h,
-        ),
-        SizedBox(
-          height: 5.h,
-        ),
+        SizedBox(height: 5.h),
         if (label1?.isNotEmpty ?? false)
           Text(
             label2!,

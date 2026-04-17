@@ -15,5 +15,6 @@ class RegisterUseCase {
     String email,
     String password,
     String phone,
-  ) => _authRepository.register(name, email, password, phone);
+    String role,
+  ) => _authRepository.register(name, email, password, phone, role);
 }

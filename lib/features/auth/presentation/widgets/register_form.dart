@@ -8,7 +8,6 @@ import '../../../../core/widgets/custom_elevated_button.dart';
 import '../../../../core/widgets/custom_text_field.dart';
 import 'auth_header.dart';
 import 'auth_toggle_message.dart';
-import 'social_section.dart';
 
 class RegisterForm extends StatelessWidget {
   final GlobalKey<FormState> formKey;
@@ -24,6 +23,8 @@ class RegisterForm extends StatelessWidget {
   final FocusNode confirmPasswordNode;
   final VoidCallback onRegisterPressed;
   final VoidCallback onLoginPressed;
+  final String selectedRole;
+  final ValueChanged<String> onRoleChanged;
 
   const RegisterForm({
     required this.formKey,
@@ -39,6 +40,8 @@ class RegisterForm extends StatelessWidget {
     required this.confirmPasswordNode,
     required this.onRegisterPressed,
     required this.onLoginPressed,
+    required this.selectedRole,
+    required this.onRoleChanged,
     super.key,
   });
 
@@ -106,6 +109,20 @@ class RegisterForm extends StatelessWidget {
             textInputFormatter: LengthLimitingTextInputFormatter(16),
             validator: (value) => Validator.validateConfirmPassword(value, passwordController.text),
           ),
+          SizedBox(height: 16.h),
+          DropdownButtonFormField<String>(
+            initialValue: selectedRole,
+            decoration: InputDecoration(
+              contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
+            ),
+            items: const [
+              DropdownMenuItem(value: 'patient', child: Text('Patient')),
+              DropdownMenuItem(value: 'doctor', child: Text('Doctor')),
+              DropdownMenuItem(value: 'admin', child: Text('Admin')),
+            ],
+            onChanged: (v) => onRoleChanged(v!),
+          ),
           SizedBox(height: 30.h),
           AuthToggleMessage(
             label1: 'Already have an account?',
@@ -115,7 +132,6 @@ class RegisterForm extends StatelessWidget {
           SizedBox(height: 24.h),
           CustomElevatedButton(label: 'Register', onTap: onRegisterPressed),
           SizedBox(height: 20.h),
-          const SocialSection(),
         ],
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class SliderInputWidget extends StatefulWidget {
   final String label;
@@ -6,15 +7,17 @@ class SliderInputWidget extends StatefulWidget {
   final double max;
   final double initialValue;
   final Function(double) onChanged;
+  final Color color;
 
   const SliderInputWidget({
-    Key? key,
+    super.key,
     required this.label,
     required this.min,
     required this.max,
     required this.initialValue,
     required this.onChanged,
-  }) : super(key: key);
+    this.color = Colors.teal,
+  });
 
   @override
   State<SliderInputWidget> createState() => _SliderInputWidgetState();
@@ -31,33 +34,65 @@ class _SliderInputWidgetState extends State<SliderInputWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(widget.label, style: const TextStyle(fontSize: 16)),
-        Row(
-          children: [
-            Expanded(
-              child: Slider(
-                value: _value,
-                min: widget.min,
-                max: widget.max,
-                divisions: (widget.max - widget.min).toInt(),
-                label: _value.toInt().toString(),
-                onChanged: (value) {
-                  setState(() => _value = value);
-                  widget.onChanged(value);
-                },
+    return Container(
+      padding: EdgeInsets.all(14.w),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(14.r),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(widget.label, style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500, height: 1.4)),
               ),
+              SizedBox(width: 12.w),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+                decoration: BoxDecoration(
+                  color: widget.color.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(20.r),
+                ),
+                child: Text(
+                  _value.toInt().toString(),
+                  style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.bold, color: widget.color),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 8.h),
+          SliderTheme(
+            data: SliderTheme.of(context).copyWith(
+              activeTrackColor: widget.color,
+              inactiveTrackColor: widget.color.withOpacity(0.15),
+              thumbColor: widget.color,
+              overlayColor: widget.color.withOpacity(0.15),
+              trackHeight: 4,
             ),
-            const SizedBox(width: 8),
-            Text(
-              _value.toInt().toString(),
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            child: Slider(
+              value: _value,
+              min: widget.min,
+              max: widget.max,
+              divisions: (widget.max - widget.min).toInt(),
+              onChanged: (v) {
+                setState(() => _value = v);
+                widget.onChanged(v);
+              },
             ),
-          ],
-        ),
-      ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(widget.min.toInt().toString(), style: TextStyle(fontSize: 11.sp, color: Colors.grey)),
+              Text(widget.max.toInt().toString(), style: TextStyle(fontSize: 11.sp, color: Colors.grey)),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

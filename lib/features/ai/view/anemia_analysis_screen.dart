@@ -1,20 +1,30 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../../core/service/service_locator.dart';
 import '../data/model/anemia_survey_model.dart';
 import '../viewmodel/prediction_cubit.dart';
 import '../viewmodel/prediction_state.dart';
-import 'text_prediction_screen.dart';
+import 'analysis_result_screen.dart';
+import '../widgets/analysis_shared_widgets.dart';
 
-class AnemiaSurveyScreen extends StatefulWidget {
-  const AnemiaSurveyScreen({super.key});
+class AnemiaAnalysisScreen extends StatefulWidget {
+  const AnemiaAnalysisScreen({super.key});
 
   @override
-  State<AnemiaSurveyScreen> createState() => _AnemiaSurveyScreenState();
+  State<AnemiaAnalysisScreen> createState() => _AnemiaAnalysisScreenState();
 }
 
-class _AnemiaSurveyScreenState extends State<AnemiaSurveyScreen> {
+class _AnemiaAnalysisScreenState extends State<AnemiaAnalysisScreen> {
+  static const _color = Colors.redAccent;
+  static const _disease = 'Anemia';
+
+  File? _image;
+  final _textController = TextEditingController();
+  late final PredictionCubit _cubit;
+
   int _age = 25;
   int _gender = 2;
   int _ethnicity = 3;
@@ -23,125 +33,49 @@ class _AnemiaSurveyScreenState extends State<AnemiaSurveyScreen> {
   int _heartCondition = 2;
   int _asthma = 2;
 
-  late final PredictionCubit _predictionCubit;
-  static const _color = Colors.redAccent;
-
   @override
   void initState() {
     super.initState();
-    _predictionCubit = getIt<PredictionCubit>();
+    _cubit = getIt<PredictionCubit>();
   }
 
-  void _submitForm() {
-    _predictionCubit.predictAnemiaSurvey(AnemiaSurveyModel(
-      age: _age,
-      gender: _gender,
-      ethnicity: _ethnicity,
-      diabetes: _diabetes,
-      hypertension: _hypertension,
-      heartCondition: _heartCondition,
-      asthma: _asthma,
-    ).toJson());
+  @override
+  void dispose() {
+    _textController.dispose();
+    super.dispose();
   }
 
-  void _showResultSheet(PredictionSuccess state) {
-    final isAnemic = state.prediction == '1';
-    final resultColor = isAnemic ? Colors.red : Colors.green;
-
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (_) => Container(
-        padding: EdgeInsets.all(28.w),
-        decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(28.r)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40.w, height: 4.h,
-              decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(2.r)),
-            ),
-            SizedBox(height: 24.h),
-            Container(
-              width: 72.w, height: 72.w,
-              decoration: BoxDecoration(color: resultColor.withOpacity(0.12), shape: BoxShape.circle),
-              child: Icon(
-                isAnemic ? Icons.warning_rounded : Icons.check_circle_rounded,
-                color: resultColor, size: 38.sp,
-              ),
-            ),
-            SizedBox(height: 16.h),
-            Text('Analysis Complete', style: TextStyle(fontSize: 13.sp, color: Colors.grey)),
-            SizedBox(height: 6.h),
-            Text(
-              isAnemic ? 'Anemia Detected' : 'No Anemia',
-              style: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold, color: resultColor),
-            ),
-            SizedBox(height: 6.h),
-            Text(
-              'Probability: ${(state.probability * 100).toStringAsFixed(1)}%',
-              style: TextStyle(fontSize: 15.sp, color: Colors.grey.shade600),
-            ),
-            if (state.message.isNotEmpty) ...[
-              SizedBox(height: 6.h),
-              Text(
-                state.message,
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 13.sp, color: Colors.grey.shade500),
-              ),
-            ],
-            SizedBox(height: 28.h),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) => const TextPredictionScreen(filterDisease: 'anemia')),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: _color,
-                  padding: EdgeInsets.symmetric(vertical: 16.h),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
-                ),
-                child: Text('Continue', style: TextStyle(fontSize: 16.sp, color: Colors.white, fontWeight: FontWeight.bold)),
-              ),
-            ),
-            SizedBox(height: 8.h),
-          ],
-        ),
-      ),
-    );
+  Future<void> _pickImage(ImageSource source) async {
+    final picked = await ImagePicker().pickImage(source: source, imageQuality: 85);
+    if (picked != null) setState(() => _image = File(picked.path));
   }
 
-  Widget _binaryRow(String label, int value, void Function(int) onChanged) {
-    return Container(
-      padding: EdgeInsets.all(14.w),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(14.r),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500, height: 1.4)),
-          SizedBox(height: 12.h),
-          Row(
-            children: [
-              _toggleBtn('No', 2, value, onChanged),
-              SizedBox(width: 8.w),
-              _toggleBtn('Yes', 1, value, onChanged),
-            ],
-          ),
-        ],
-      ),
+  void _analyze() {
+    if (_image == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Please upload an image')));
+      return;
+    }
+    if (_textController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Please describe your symptoms')));
+      return;
+    }
+    _cubit.runCombinedAnalysis(
+      disease: _disease,
+      imageFile: _image!,
+      surveyData: AnemiaSurveyModel(
+        age: _age,
+        gender: _gender,
+        ethnicity: _ethnicity,
+        diabetes: _diabetes,
+        hypertension: _hypertension,
+        heartCondition: _heartCondition,
+        asthma: _asthma,
+      ).toJson(),
+      symptomText: _textController.text.trim(),
     );
   }
 
@@ -172,22 +106,59 @@ class _AnemiaSurveyScreenState extends State<AnemiaSurveyScreen> {
     );
   }
 
+  Widget _binaryRow(String label, int value, void Function(int) onChanged) {
+    return Container(
+      padding: EdgeInsets.all(14.w),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(14.r),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500, height: 1.4),
+          ),
+          SizedBox(height: 12.h),
+          Row(
+            children: [
+              _toggleBtn('No', 2, value, onChanged),
+              SizedBox(width: 8.w),
+              _toggleBtn('Yes', 1, value, onChanged),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider.value(
-      value: _predictionCubit,
+      value: _cubit,
       child: BlocListener<PredictionCubit, PredictionState>(
         listener: (context, state) {
-          if (state is PredictionSuccess && ModalRoute.of(context)?.isCurrent == true) {
-            _showResultSheet(state);
-          } else if (state is PredictionError && ModalRoute.of(context)?.isCurrent == true) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: ${state.message}')));
+          if (state is CombinedAnalysisSuccess) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => AnalysisResultScreen(
+                  disease: _disease,
+                  color: _color,
+                  icon: '🩸',
+                  result: state,
+                ),
+              ),
+            );
+          } else if (state is PredictionError) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
           }
         },
         child: Scaffold(
           body: CustomScrollView(
             slivers: [
-              // ── Gradient App Bar ──────────────────────────────
               SliverAppBar(
                 expandedHeight: 150.h,
                 pinned: true,
@@ -222,8 +193,18 @@ class _AnemiaSurveyScreenState extends State<AnemiaSurveyScreen> {
                           children: [
                             Text('🩸', style: TextStyle(fontSize: 30.sp)),
                             SizedBox(height: 4.h),
-                            Text('Anemia Survey', style: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.bold, color: Colors.white)),
-                            Text('Answer honestly for best results', style: TextStyle(fontSize: 13.sp, color: Colors.white70)),
+                            Text(
+                              'Anemia Analysis',
+                              style: TextStyle(
+                                fontSize: 22.sp,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                            Text(
+                              'Complete all sections for accurate results',
+                              style: TextStyle(fontSize: 13.sp, color: Colors.white70),
+                            ),
                           ],
                         ),
                       ),
@@ -231,16 +212,28 @@ class _AnemiaSurveyScreenState extends State<AnemiaSurveyScreen> {
                   ),
                 ),
               ),
-
               SliverPadding(
                 padding: EdgeInsets.all(20.w),
                 sliver: SliverList(
                   delegate: SliverChildListDelegate([
-                    // ── Demographics ────────────────────────────
-                    _SurveySection(title: 'Demographics', icon: Icons.person_rounded, color: _color),
+                    // ── Step 1: Image ──────────────────────────────
+                    const StepHeader(step: '1', title: 'Upload Eye Image', color: _color),
+                    SizedBox(height: 12.h),
+                    AnalysisImagePicker(
+                      image: _image,
+                      color: _color,
+                      samplePath: 'assets/images/eye.webp',
+                      onPick: _pickImage,
+                      onRemove: () => setState(() => _image = null),
+                    ),
+
+                    SizedBox(height: 28.h),
+
+                    // ── Step 2: Survey ─────────────────────────────
+                    const StepHeader(step: '2', title: 'Health Survey', color: _color),
                     SizedBox(height: 12.h),
 
-                    // Age input
+                    // Age
                     Container(
                       padding: EdgeInsets.all(14.w),
                       decoration: BoxDecoration(
@@ -251,7 +244,10 @@ class _AnemiaSurveyScreenState extends State<AnemiaSurveyScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Age (years)', style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500)),
+                          Text(
+                            'Age (years)',
+                            style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500),
+                          ),
                           SizedBox(height: 10.h),
                           TextFormField(
                             initialValue: _age.toString(),
@@ -260,7 +256,10 @@ class _AnemiaSurveyScreenState extends State<AnemiaSurveyScreen> {
                               hintText: 'Enter age (1–120)',
                               filled: true,
                               fillColor: Colors.white,
-                              contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h),
+                              contentPadding: EdgeInsets.symmetric(
+                                horizontal: 14.w,
+                                vertical: 14.h,
+                              ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12.r),
                                 borderSide: BorderSide(color: Colors.grey.shade200),
@@ -282,7 +281,6 @@ class _AnemiaSurveyScreenState extends State<AnemiaSurveyScreen> {
                         ],
                       ),
                     ),
-
                     SizedBox(height: 10.h),
 
                     // Gender
@@ -296,7 +294,10 @@ class _AnemiaSurveyScreenState extends State<AnemiaSurveyScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Biological Sex', style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500)),
+                          Text(
+                            'Biological Sex',
+                            style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500),
+                          ),
                           SizedBox(height: 12.h),
                           Row(
                             children: [
@@ -308,7 +309,6 @@ class _AnemiaSurveyScreenState extends State<AnemiaSurveyScreen> {
                         ],
                       ),
                     ),
-
                     SizedBox(height: 10.h),
 
                     // Ethnicity
@@ -322,17 +322,32 @@ class _AnemiaSurveyScreenState extends State<AnemiaSurveyScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Ethnicity', style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500)),
+                          Text(
+                            'Ethnicity',
+                            style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500),
+                          ),
                           SizedBox(height: 10.h),
                           DropdownButtonFormField<int>(
                             value: _ethnicity,
                             decoration: InputDecoration(
                               filled: true,
                               fillColor: Colors.white,
-                              contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h),
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide(color: Colors.grey.shade200)),
-                              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide(color: Colors.grey.shade200)),
-                              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: const BorderSide(color: _color)),
+                              contentPadding: EdgeInsets.symmetric(
+                                horizontal: 14.w,
+                                vertical: 14.h,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12.r),
+                                borderSide: BorderSide(color: Colors.grey.shade200),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12.r),
+                                borderSide: BorderSide(color: Colors.grey.shade200),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12.r),
+                                borderSide: const BorderSide(color: _color),
+                              ),
                             ),
                             items: const [
                               DropdownMenuItem(value: 1, child: Text('Mexican American')),
@@ -346,39 +361,84 @@ class _AnemiaSurveyScreenState extends State<AnemiaSurveyScreen> {
                         ],
                       ),
                     ),
+                    SizedBox(height: 10.h),
 
-                    SizedBox(height: 24.h),
+                    _binaryRow(
+                      'Have you been diagnosed with diabetes?',
+                      _diabetes,
+                      (v) => _diabetes = v,
+                    ),
+                    SizedBox(height: 10.h),
+                    _binaryRow(
+                      'Have you been diagnosed with hypertension?',
+                      _hypertension,
+                      (v) => _hypertension = v,
+                    ),
+                    SizedBox(height: 10.h),
+                    _binaryRow(
+                      'Have you been diagnosed with a heart condition?',
+                      _heartCondition,
+                      (v) => _heartCondition = v,
+                    ),
+                    SizedBox(height: 10.h),
+                    _binaryRow('Have you been diagnosed with asthma?', _asthma, (v) => _asthma = v),
 
-                    // ── Medical History ──────────────────────────
-                    _SurveySection(title: 'Medical History', icon: Icons.medical_services_rounded, color: _color),
+                    SizedBox(height: 28.h),
+
+                    // ── Step 3: Symptoms Text ──────────────────────
+                    const StepHeader(step: '3', title: 'Describe Your Symptoms', color: _color),
                     SizedBox(height: 12.h),
-
-                    _binaryRow('Have you ever been told by a doctor that you have diabetes?', _diabetes, (v) => _diabetes = v),
-                    SizedBox(height: 10.h),
-                    _binaryRow('Have you ever been diagnosed with high blood pressure (hypertension)?', _hypertension, (v) => _hypertension = v),
-                    SizedBox(height: 10.h),
-                    _binaryRow('Have you ever been diagnosed with a heart condition?', _heartCondition, (v) => _heartCondition = v),
-                    SizedBox(height: 10.h),
-                    _binaryRow('Have you ever been diagnosed with asthma?', _asthma, (v) => _asthma = v),
+                    TextField(
+                      controller: _textController,
+                      maxLines: 4,
+                      decoration: InputDecoration(
+                        hintText: 'e.g., I feel very tired, pale skin, shortness of breath...',
+                        filled: true,
+                        fillColor: Colors.grey.shade50,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14.r),
+                          borderSide: BorderSide(color: Colors.grey.shade200),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14.r),
+                          borderSide: BorderSide(color: Colors.grey.shade200),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14.r),
+                          borderSide: const BorderSide(color: _color),
+                        ),
+                      ),
+                    ),
 
                     SizedBox(height: 32.h),
 
+                    // ── Analyze Button ─────────────────────────────
                     BlocBuilder<PredictionCubit, PredictionState>(
                       builder: (context, state) {
                         final loading = state is PredictionLoading;
                         return DecoratedBox(
                           decoration: BoxDecoration(
-                            gradient: const LinearGradient(colors: [Color(0xFFB71C1C), Colors.redAccent]),
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFFB71C1C), Colors.redAccent],
+                            ),
                             borderRadius: BorderRadius.circular(16.r),
-                            boxShadow: [BoxShadow(color: _color.withOpacity(0.4), blurRadius: 12, offset: const Offset(0, 6))],
+                            boxShadow: [
+                              BoxShadow(
+                                color: _color.withOpacity(0.4),
+                                blurRadius: 12,
+                                offset: const Offset(0, 6),
+                              ),
+                            ],
                           ),
                           child: ElevatedButton(
-                            onPressed: loading ? null : _submitForm,
+                            onPressed: loading ? null : _analyze,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.transparent,
                               shadowColor: Colors.transparent,
                               minimumSize: Size(double.infinity, 54.h),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16.r),
+                              ),
                             ),
                             child: loading
                                 ? const CircularProgressIndicator(color: Colors.white)
@@ -387,7 +447,14 @@ class _AnemiaSurveyScreenState extends State<AnemiaSurveyScreen> {
                                     children: [
                                       const Icon(Icons.auto_awesome_rounded, color: Colors.white),
                                       SizedBox(width: 8.w),
-                                      Text('Analyze Survey', style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold, color: Colors.white)),
+                                      Text(
+                                        'Analyze',
+                                        style: TextStyle(
+                                          fontSize: 16.sp,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
                                     ],
                                   ),
                           ),
@@ -402,28 +469,6 @@ class _AnemiaSurveyScreenState extends State<AnemiaSurveyScreen> {
           ),
         ),
       ),
-    );
-  }
-}
-
-class _SurveySection extends StatelessWidget {
-  final String title;
-  final IconData icon;
-  final Color color;
-  const _SurveySection({required this.title, required this.icon, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          padding: EdgeInsets.all(6.w),
-          decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(8.r)),
-          child: Icon(icon, color: color, size: 16.sp),
-        ),
-        SizedBox(width: 8.w),
-        Text(title, style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold)),
-      ],
     );
   }
 }

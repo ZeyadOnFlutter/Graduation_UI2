@@ -7,5 +7,6 @@ extension UserEntityMapper on UserEntity {
         name: name,
         email: email,
         phone: phone,
+        role: role.name,
       );
 }

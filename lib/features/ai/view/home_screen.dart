@@ -1,45 +1,81 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../../core/service/service_locator.dart';
+import '../../auth/presentation/cubit/auth_hydrated_cubit.dart';
+import '../../auth/presentation/cubit/auth_state.dart';
 import '../widgets/category_card.dart';
-import '../widgets/info_card.dart';
-import 'survey_screen.dart';
-import 'upload_screen.dart';
-import 'anemia_survey_screen.dart';
-import 'text_prediction_screen.dart';
+import 'diabetes_analysis_screen.dart';
+import 'anemia_analysis_screen.dart';
 import '../../clinical_guidance/view/guidance_detail_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
+
+
   @override
   Widget build(BuildContext context) {
+    final userName = context.select<AuthCubit, String>(
+      (cubit) => cubit.state is Authenticated
+          ? (cubit.state as Authenticated).user.name.split(' ').first
+          : 'there',
+    );
+
     return SafeArea(
       child: SingleChildScrollView(
-        padding: EdgeInsets.all(16.w),
+        padding: EdgeInsets.symmetric(horizontal: 20.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Welcome Back!',
-              style: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 4.h),
-            Text(
-              'Monitor your health through AI analysis',
-              style: TextStyle(color: Colors.grey, fontSize: 14.sp),
-            ),
             SizedBox(height: 20.h),
 
-            // Info Card instead of gradient button
+            // ── Header ──────────────────────────────────────────────
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Hello, $userName 👋',
+                      style: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 4.h),
+                    Text(
+                      'How are you feeling today?',
+                      style: TextStyle(fontSize: 13.sp, color: Colors.grey),
+                    ),
+                  ],
+                ),
+                CircleAvatar(
+                  radius: 22.r,
+                  backgroundColor: Colors.blue.withOpacity(0.15),
+                  child: Icon(Icons.person_rounded, color: Colors.blue, size: 24.sp),
+                ),
+              ],
+            ),
+
+            SizedBox(height: 24.h),
+
+            // ── Hero Banner ─────────────────────────────────────────
             Container(
-              padding: EdgeInsets.all(20.w),
+              width: double.infinity,
+              padding: EdgeInsets.all(22.w),
               decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(24.r),
                 gradient: const LinearGradient(
-                  colors: [Colors.blue, Colors.purple],
+                  colors: [Color(0xFF1565C0), Color(0xFF7B1FA2)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
-                borderRadius: BorderRadius.circular(20.r),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF1565C0).withOpacity(0.4),
+                    blurRadius: 20,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
               ),
               child: Row(
                 children: [
@@ -47,135 +83,184 @@ class HomeScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(20.r),
+                          ),
+                          child: Text(
+                            '✨ AI Powered',
+                            style: TextStyle(fontSize: 11.sp, color: Colors.white),
+                          ),
+                        ),
+                        SizedBox(height: 10.h),
                         Text(
-                          'AI Health Analysis',
+                          'Smart Health\nAnalysis',
                           style: TextStyle(
-                            fontSize: 20.sp,
+                            fontSize: 22.sp,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
+                            height: 1.3,
                           ),
                         ),
                         SizedBox(height: 8.h),
                         Text(
-                          'Select a category below to start your health scan',
-                          style: TextStyle(color: Colors.white70, fontSize: 14.sp),
+                          'Detect conditions early\nwith AI precision',
+                          style: TextStyle(fontSize: 12.sp, color: Colors.white70, height: 1.5),
                         ),
                       ],
                     ),
                   ),
-                  Icon(Icons.health_and_safety, size: 50.sp, color: Colors.white70),
+                  Icon(Icons.health_and_safety_rounded, size: 80.sp, color: Colors.white.withOpacity(0.25)),
                 ],
               ),
             ),
 
             SizedBox(height: 30.h),
-            Text(
-              'Detection Categories',
-              style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 12.h),
 
-            // Two category cards
+            // ── Detection Categories ────────────────────────────────
+            _SectionHeader(title: 'Detection Categories', subtitle: 'Select a condition to analyze'),
+            SizedBox(height: 14.h),
+
             GridView.count(
               crossAxisCount: 2,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              childAspectRatio: 1.2,
-              crossAxisSpacing: 12.w,
-              mainAxisSpacing: 12.h,
+              childAspectRatio: 1.05,
+              crossAxisSpacing: 14.w,
+              mainAxisSpacing: 14.h,
               children: [
                 GestureDetector(
-                  onTap: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text('Anemia Detection'),
-                        content: const Text('Choose your preferred method:'),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const UploadScreen(
-                                    category: 'Anemia',
-                                    icon: '🩸',
-                                    color: Colors.redAccent,
-                                    sampleImagePath: 'assets/images/eye.webp',
-                                  ),
-                                ),
-                              );
-                            },
-                            child: const Text('Quick'),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => const AnemiaSurveyScreen()),
-                              );
-                            },
-                            child: const Text('Precise'),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                  child: const CategoryCard(icon: '🩸', name: 'Anemia', color: Colors.redAccent),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const AnemiaAnalysisScreen()),
+                  ),
+                  child: const CategoryCard(
+                    icon: '🩸',
+                    name: 'Anemia',
+                    color: Colors.redAccent,
+                    subtitle: 'Eye · Survey · Symptoms',
+                  ),
                 ),
                 GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const HealthSurveyScreen()),
-                    );
-                  },
-                  child: const CategoryCard(icon: '🔬', name: 'Diabetes', color: Colors.blueAccent),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const DiabetesAnalysisScreen()),
+                  ),
+                  child: const CategoryCard(
+                    icon: '🔬',
+                    name: 'Diabetes',
+                    color: Colors.blueAccent,
+                    subtitle: 'Tongue · Survey · Symptoms',
+                  ),
                 ),
               ],
             ),
 
             SizedBox(height: 30.h),
-            Text(
-              'Clinical Guidance',
-              style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 12.h),
+
+            // ── Clinical Guidance ───────────────────────────────────
+            _SectionHeader(title: 'Clinical Guidance', subtitle: 'Learn about conditions'),
+            SizedBox(height: 14.h),
+
             Row(
               children: [
                 Expanded(
-                  child: ElevatedButton(
-                    onPressed: () => Navigator.push(
+                  child: _GuidanceCard(
+                    label: 'Anemia',
+                    icon: '🩸',
+                    color: const Color(0xFFE53935),
+                    onTap: () => Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const GuidanceDetailScreen(type: 'anemia')),
+                      MaterialPageRoute(builder: (_) => const GuidanceDetailScreen(type: 'anemia')),
                     ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFE53935),
-                      padding: EdgeInsets.symmetric(vertical: 16.h),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-                    ),
-                    child: Text('Anemia', style: TextStyle(fontSize: 16.sp, color: Colors.white)),
                   ),
                 ),
                 SizedBox(width: 12.w),
                 Expanded(
-                  child: ElevatedButton(
-                    onPressed: () => Navigator.push(
+                  child: _GuidanceCard(
+                    label: 'Diabetes',
+                    icon: '🔬',
+                    color: const Color(0xFF1E88E5),
+                    onTap: () => Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const GuidanceDetailScreen(type: 'diabetes')),
+                      MaterialPageRoute(builder: (_) => const GuidanceDetailScreen(type: 'diabetes')),
                     ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF1E88E5),
-                      padding: EdgeInsets.symmetric(vertical: 16.h),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-                    ),
-                    child: Text('Diabetes', style: TextStyle(fontSize: 16.sp, color: Colors.white)),
                   ),
                 ),
               ],
             ),
+
+            SizedBox(height: 30.h),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+
+class _SectionHeader extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  const _SectionHeader({required this.title, required this.subtitle});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title, style: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.bold)),
+            SizedBox(height: 2.h),
+            Text(subtitle, style: TextStyle(fontSize: 12.sp, color: Colors.grey)),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _GuidanceCard extends StatelessWidget {
+  final String label;
+  final String icon;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _GuidanceCard({
+    required this.label,
+    required this.icon,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 18.h),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16.r),
+          color: color.withOpacity(0.08),
+          border: Border.all(color: color.withOpacity(0.25)),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(icon, style: TextStyle(fontSize: 18.sp)),
+            SizedBox(width: 8.w),
+            Text(
+              label,
+              style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w600, color: color),
+            ),
+            SizedBox(width: 4.w),
+            Icon(Icons.arrow_forward_ios_rounded, size: 12.sp, color: color),
           ],
         ),
       ),

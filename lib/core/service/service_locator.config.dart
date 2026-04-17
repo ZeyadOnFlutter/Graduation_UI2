@@ -14,6 +14,8 @@ import 'package:dio/dio.dart' as _i361;
 import 'package:firebase_auth/firebase_auth.dart' as _i59;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:heal_app/core/service/register_module.dart' as _i155;
+import 'package:heal_app/features/admin/data/admin_data_source.dart' as _i237;
+import 'package:heal_app/features/admin/viewmodel/admin_cubit.dart' as _i750;
 import 'package:heal_app/features/ai/data/data_source/prediction_api_data_source.dart'
     as _i732;
 import 'package:heal_app/features/ai/data/data_source/prediction_remote_data_source.dart'
@@ -29,10 +31,6 @@ import 'package:heal_app/features/auth/data/repository/auth_repository_impl.dart
     as _i319;
 import 'package:heal_app/features/auth/domain/repository/auth_repository.dart'
     as _i977;
-import 'package:heal_app/features/auth/domain/use_case/facebook_sign_in_use_case.dart'
-    as _i457;
-import 'package:heal_app/features/auth/domain/use_case/google_sign_in_use_case.dart'
-    as _i83;
 import 'package:heal_app/features/auth/domain/use_case/login_use_case.dart'
     as _i159;
 import 'package:heal_app/features/auth/domain/use_case/logout_use_case.dart'
@@ -79,6 +77,12 @@ extension GetItInjectableX on _i174.GetIt {
       () => registerModule.anemiaDio,
       instanceName: 'AnemiaDio',
     );
+    gh.lazySingleton<_i237.AdminDataSource>(
+      () => _i237.AdminDataSource(
+        gh<_i974.FirebaseFirestore>(),
+        gh<_i59.FirebaseAuth>(),
+      ),
+    );
     gh.lazySingleton<_i383.PredictionRemoteDataSource>(
       () => _i732.PredictionApiDataSource(
         gh<_i361.Dio>(instanceName: 'MainDio'),
@@ -98,11 +102,8 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i59.FirebaseAuth>(),
       ),
     );
-    gh.lazySingleton<_i457.FacebookSignInUseCase>(
-      () => _i457.FacebookSignInUseCase(gh<_i977.AuthRepository>()),
-    );
-    gh.lazySingleton<_i83.GoogleSignInUseCase>(
-      () => _i83.GoogleSignInUseCase(gh<_i977.AuthRepository>()),
+    gh.lazySingleton<_i750.AdminCubit>(
+      () => _i750.AdminCubit(gh<_i237.AdminDataSource>()),
     );
     gh.lazySingleton<_i159.LoginUseCase>(
       () => _i159.LoginUseCase(gh<_i977.AuthRepository>()),
@@ -118,8 +119,6 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.singleton<_i823.AuthCubit>(
       () => _i823.AuthCubit(
-        gh<_i457.FacebookSignInUseCase>(),
-        gh<_i83.GoogleSignInUseCase>(),
         gh<_i159.LoginUseCase>(),
         gh<_i996.RegisterUseCase>(),
         gh<_i445.LogoutUseCase>(),

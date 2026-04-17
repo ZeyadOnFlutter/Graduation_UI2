@@ -9,9 +9,8 @@ abstract class AuthRepository {
     String email,
     String password,
     String phone,
+    String role,
   );
   Future<Either<Failure, UserEntity>> login(String email, String password);
-  Future<Either<Failure, UserEntity>> signInWithGoogle();
-  Future<Either<Failure, UserEntity>> signInWithFacebook();
   Future<Either<Failure, Unit>> logout();
 }

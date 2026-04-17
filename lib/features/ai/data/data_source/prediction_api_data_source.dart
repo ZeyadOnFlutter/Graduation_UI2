@@ -32,6 +32,7 @@ class PredictionApiDataSource implements PredictionRemoteDataSource {
       });
 
       final response = await _mainDio.post(ApiEndpoints.diabetesPredict, data: formData);
+      print('Image Prediction API Response: ${response.data}');
 
       return PredictionResponse.fromJson(response.data);
     } on DioException catch (e) {
@@ -42,13 +43,13 @@ class PredictionApiDataSource implements PredictionRemoteDataSource {
   @override
   Future<PredictionResponse> predictHealthData(HealthDataModel healthData) async {
     try {
-      final response = await _predictDio.post(
-        ApiEndpoints.diabetesPredict,
-        data: healthData.toJson(),
-      );
-      print(response.data);
+      final body = healthData.toJson();
+      print('Diabetes Survey Request: $body');
+      final response = await _predictDio.post(ApiEndpoints.diabetesPredict, data: body);
+      print('Diabetes Survey Response: ${response.data}');
       return PredictionResponse.fromJson(response.data);
     } on DioException catch (e) {
+      print('Diabetes Survey Error: ${e.response?.statusCode} ${e.response?.data}');
       throw ApiErrorHandler.handleDioError(e);
     }
   }
@@ -86,10 +87,7 @@ class PredictionApiDataSource implements PredictionRemoteDataSource {
   @override
   Future<TextPredictionResponse> predictFromText(String text) async {
     try {
-      final response = await _textPredictDio.post(
-        ApiEndpoints.textPredict,
-        data: {'text': text},
-      );
+      final response = await _textPredictDio.post(ApiEndpoints.textPredict, data: {'text': text});
       return TextPredictionResponse.fromJson(response.data);
     } on DioException catch (e) {
       throw ApiErrorHandler.handleDioError(e);

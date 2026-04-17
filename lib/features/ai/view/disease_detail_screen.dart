@@ -6,15 +6,12 @@ import 'diabetes_detail_screen.dart';
 class DiseaseDetailScreen extends StatelessWidget {
   final TextPredictionResponse response;
 
-  const DiseaseDetailScreen({Key? key, required this.response}) : super(key: key);
+  const DiseaseDetailScreen({super.key, required this.response});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Analysis Results'),
-        backgroundColor: Colors.teal,
-      ),
+      appBar: AppBar(title: const Text('Analysis Results'), backgroundColor: Colors.teal),
       body: response.results.isEmpty
           ? Center(
               child: Padding(
@@ -83,16 +80,12 @@ class DiseaseDetailScreen extends StatelessWidget {
             if (result.disease.toLowerCase() == 'anemia') {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => AnemiaDetailScreen(detail: detail),
-                ),
+                MaterialPageRoute(builder: (context) => AnemiaDetailScreen(detail: detail)),
               );
             } else if (result.disease.toLowerCase() == 'diabetes') {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => DiabetesDetailScreen(detail: detail),
-                ),
+                MaterialPageRoute(builder: (context) => DiabetesDetailScreen(detail: detail)),
               );
             }
           }
@@ -111,11 +104,7 @@ class DiseaseDetailScreen extends StatelessWidget {
                 child: Center(
                   child: Text(
                     '${result.percentage.toStringAsFixed(1)}%',
-                    style: TextStyle(
-                      color: color,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
+                    style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 14),
                   ),
                 ),
               ),
@@ -126,11 +115,7 @@ class DiseaseDetailScreen extends StatelessWidget {
                   children: [
                     Text(
                       result.disease.toUpperCase(),
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: color,
-                      ),
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: color),
                     ),
                     const SizedBox(height: 4),
                     Text(

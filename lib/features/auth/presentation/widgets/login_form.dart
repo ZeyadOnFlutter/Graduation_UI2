@@ -11,7 +11,6 @@ import '../../../../core/widgets/custom_elevated_button.dart';
 import '../../../../core/widgets/custom_text_field.dart';
 import 'auth_header.dart';
 import 'auth_toggle_message.dart';
-import 'social_section.dart';
 
 class LoginForm extends StatelessWidget {
   final GlobalKey<FormState> formKey;
@@ -80,7 +79,6 @@ class LoginForm extends StatelessWidget {
               SizedBox(height: 24.h),
               CustomElevatedButton(label: 'Login', onTap: onLoginPressed),
               SizedBox(height: 20.h),
-              const SocialSection(),
             ],
           ),
         ),

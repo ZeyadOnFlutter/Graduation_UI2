@@ -35,10 +35,10 @@ dependencies:
   equatable: ^2.0.5
   firebase_auth: ^6.1.4
   firebase_core: ^4.4.0
+  firebase_storage: ^13.3.0
   flutter:
     sdk: flutter
   flutter_bloc: ^9.1.1
-  flutter_facebook_auth: ^7.1.5
   flutter_keyboard_visibility: ^6.0.0
   flutter_screenutil: ^5.9.3
   flutter_svg: ^2.2.3

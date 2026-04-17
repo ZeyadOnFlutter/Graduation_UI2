@@ -126,25 +126,67 @@ class AnemiaSurvey {
   }
 }
 
+class CombinedAnalysisResult {
+  final String disease;
+  final double finalScore;
+  final double imgScore;
+  final double surveyScore;
+  final double nlpScore;
+  final DateTime timestamp;
+
+  const CombinedAnalysisResult({
+    required this.disease,
+    required this.finalScore,
+    required this.imgScore,
+    required this.surveyScore,
+    required this.nlpScore,
+    required this.timestamp,
+  });
+
+  factory CombinedAnalysisResult.fromJson(Map<String, dynamic> json) {
+    return CombinedAnalysisResult(
+      disease: json['disease'] ?? '',
+      finalScore: (json['finalScore'] ?? 0.0).toDouble(),
+      imgScore: (json['imgScore'] ?? 0.0).toDouble(),
+      surveyScore: (json['surveyScore'] ?? 0.0).toDouble(),
+      nlpScore: (json['nlpScore'] ?? 0.0).toDouble(),
+      timestamp: DateTime.parse(json['timestamp']),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'disease': disease,
+        'finalScore': finalScore,
+        'imgScore': imgScore,
+        'surveyScore': surveyScore,
+        'nlpScore': nlpScore,
+        'timestamp': timestamp.toIso8601String(),
+      };
+}
+
 class UserModel {
   final String id;
   final String name;
   final String email;
   final String phone;
+  final String role;
   final List<DiabetesRecord> diabetesRecords;
   final List<AnemiaRecord> anemiaRecords;
   final List<DiabetesSurvey> diabetesSurveys;
   final List<AnemiaSurvey> anemiaSurveys;
+  final List<CombinedAnalysisResult> combinedResults;
 
   const UserModel({
     required this.id,
     required this.name,
     required this.email,
     required this.phone,
+    this.role = 'patient',
     this.diabetesRecords = const [],
     this.anemiaRecords = const [],
     this.diabetesSurveys = const [],
     this.anemiaSurveys = const [],
+    this.combinedResults = const [],
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -152,7 +194,8 @@ class UserModel {
       id: json['id'],
       name: json['name'],
       email: json['email'],
-      phone: json['phone'],
+      phone: json['phone'] ?? '',
+      role: json['role'] ?? 'patient',
       diabetesRecords: (json['diabetesRecords'] as List<dynamic>?)
           ?.map((e) => DiabetesRecord.fromJson(e))
           .toList() ?? [],
@@ -165,6 +208,9 @@ class UserModel {
       anemiaSurveys: (json['anemiaSurveys'] as List<dynamic>?)
           ?.map((e) => AnemiaSurvey.fromJson(e))
           .toList() ?? [],
+      combinedResults: (json['combinedResults'] as List<dynamic>?)
+          ?.map((e) => CombinedAnalysisResult.fromJson(e))
+          .toList() ?? [],
     );
   }
 
@@ -174,10 +220,12 @@ class UserModel {
       'name': name,
       'email': email,
       'phone': phone,
+      'role': role,
       'diabetesRecords': diabetesRecords.map((e) => e.toJson()).toList(),
       'anemiaRecords': anemiaRecords.map((e) => e.toJson()).toList(),
       'diabetesSurveys': diabetesSurveys.map((e) => e.toJson()).toList(),
       'anemiaSurveys': anemiaSurveys.map((e) => e.toJson()).toList(),
+      'combinedResults': combinedResults.map((e) => e.toJson()).toList(),
     };
   }
 }

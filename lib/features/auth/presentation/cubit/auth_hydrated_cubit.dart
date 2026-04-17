@@ -5,8 +5,6 @@ import '../../data/mappers/user_entity_mapper.dart';
 import '../../data/mappers/user_mapper.dart';
 import '../../data/models/user_model.dart';
 import '../../domain/entities/user_entity.dart';
-import '../../domain/use_case/facebook_sign_in_use_case.dart';
-import '../../domain/use_case/google_sign_in_use_case.dart';
 import '../../domain/use_case/login_use_case.dart';
 import '../../domain/use_case/logout_use_case.dart';
 import '../../domain/use_case/register_use_case.dart';
@@ -15,16 +13,12 @@ import 'auth_state.dart';
 @singleton
 class AuthCubit extends HydratedCubit<AuthState> {
   AuthCubit(
-    this._facebookSignInUseCase,
-    this._googleSignInUseCase,
     this._loginUseCase,
     this._registerUseCase,
     this._logoutUseCase,
   ) : super(AuthInitial());
   final LoginUseCase _loginUseCase;
   final RegisterUseCase _registerUseCase;
-  final GoogleSignInUseCase _googleSignInUseCase;
-  final FacebookSignInUseCase _facebookSignInUseCase;
   final LogoutUseCase _logoutUseCase;
 
   Future<void> login(String email, String password) async {
@@ -36,27 +30,9 @@ class AuthCubit extends HydratedCubit<AuthState> {
     );
   }
 
-  Future<void> register(String name, String email, String password, String phone) async {
+  Future<void> register(String name, String email, String password, String phone, String role) async {
     emit(AuthLoading());
-    final result = await _registerUseCase(name, email, password, phone);
-    result.fold(
-      (failure) => emit(AuthError(failure.message)),
-      (user) => emit(Authenticated(user)),
-    );
-  }
-
-  Future<void> signInWithGoogle() async {
-    emit(AuthLoading());
-    final result = await _googleSignInUseCase();
-    result.fold(
-      (failure) => emit(AuthError(failure.message)),
-      (user) => emit(Authenticated(user)),
-    );
-  }
-
-  Future<void> signInWithFacebook() async {
-    emit(AuthLoading());
-    final result = await _facebookSignInUseCase();
+    final result = await _registerUseCase(name, email, password, phone, role);
     result.fold(
       (failure) => emit(AuthError(failure.message)),
       (user) => emit(Authenticated(user)),
@@ -68,7 +44,10 @@ class AuthCubit extends HydratedCubit<AuthState> {
     final result = await _logoutUseCase();
     result.fold(
       (failure) => emit(AuthError(failure.message)),
-      (_) => emit(Unauthenticated()),
+      (_) async {
+        await clear(); // only clears this cubit's storage
+        emit(Unauthenticated());
+      },
     );
   }
 

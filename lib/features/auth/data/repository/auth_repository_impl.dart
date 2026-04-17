@@ -39,32 +39,14 @@ class AuthRepositoryImpl implements AuthRepository {
     String email,
     String password,
     String phone,
+    String role,
   ) async {
     try {
-      final response = await _firebaseAuthDataSource.register(name, email, password, phone);
+      final response = await _firebaseAuthDataSource.register(name, email, password, phone, role);
       return Right(response!.toEntity);
     } on RemoteException catch (e) {
       return Left(Failure(e.message));
     }
   }
 
-  @override
-  Future<Either<Failure, UserEntity>> signInWithFacebook() async {
-    try {
-      final response = await _firebaseAuthDataSource.signInWithFacebook();
-      return Right(response!.toEntity);
-    } on RemoteException catch (e) {
-      return Left(Failure(e.message));
-    }
-  }
-
-  @override
-  Future<Either<Failure, UserEntity>> signInWithGoogle() async {
-    try {
-      final response = await _firebaseAuthDataSource.signInWithGoogle();
-      return Right(response!.toEntity);
-    } on RemoteException catch (e) {
-      return Left(Failure(e.message));
-    }
-  }
 }

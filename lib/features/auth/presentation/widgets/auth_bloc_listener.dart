@@ -6,8 +6,7 @@ import '../cubit/auth_state.dart';
 
 class AuthBlocListener extends StatelessWidget {
   final Widget child;
-  final Widget routePath;
-  const AuthBlocListener({super.key, required this.child, required this.routePath});
+  const AuthBlocListener({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {
@@ -20,10 +19,9 @@ class AuthBlocListener extends StatelessWidget {
           UIUtils.showMessage(state.message);
         } else if (state is Authenticated) {
           UIUtils.hideLoading(context);
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => routePath));
+          Navigator.of(context).popUntil((route) => route.isFirst);
         } else if (state is Unauthenticated) {
           UIUtils.hideLoading(context);
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => routePath));
         }
       },
       child: child,

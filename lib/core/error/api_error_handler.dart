@@ -15,7 +15,7 @@ class ApiErrorHandler {
         throw const RemoteException('Invalid SSL certificate. The connection is not secure.');
       case DioExceptionType.badResponse:
         throw RemoteException(
-          e.message ?? 'Received invalid status code: ${e.response?.statusCode}',
+          e.response?.data?.toString() ?? e.message ?? 'Status: ${e.response?.statusCode}',
         );
       case DioExceptionType.cancel:
         throw const RemoteException('Request was cancelled.');
