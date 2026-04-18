@@ -14,6 +14,8 @@ import '../widgets/slider_input_widget.dart';
 import 'analysis_result_screen.dart';
 import '../widgets/analysis_shared_widgets.dart';
 
+import 'analysis_history_screen.dart';
+
 class DiabetesAnalysisScreen extends StatefulWidget {
   const DiabetesAnalysisScreen({super.key});
 
@@ -43,7 +45,7 @@ class _DiabetesAnalysisScreenState extends State<DiabetesAnalysisScreen> {
   }
 
   Future<void> _pickImage(ImageSource source) async {
-    final picked = await ImagePicker().pickImage(source: source, imageQuality: 85);
+    final picked = await ImagePicker().pickImage(source: source);
     if (picked != null) setState(() => _image = File(picked.path));
   }
 
@@ -108,6 +110,22 @@ class _DiabetesAnalysisScreenState extends State<DiabetesAnalysisScreen> {
                     child: const Icon(Icons.arrow_back_rounded, color: Colors.white),
                   ),
                 ),
+                actions: [
+                  GestureDetector(
+                    onTap: () => Navigator.push(context, MaterialPageRoute(
+                      builder: (_) => const AnalysisHistoryScreen(disease: _disease, color: _color, icon: '🔬'),
+                    )),
+                    child: Container(
+                      margin: EdgeInsets.all(8.w),
+                      padding: EdgeInsets.all(8.w),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                      child: Icon(Icons.history_rounded, color: Colors.white, size: 20.sp),
+                    ),
+                  ),
+                ],
                 flexibleSpace: FlexibleSpaceBar(
                   background: Container(
                     decoration: const BoxDecoration(

@@ -13,6 +13,9 @@ abstract class FirebaseAuthDataSource {
   Future<void> addAnemiaRecord(String userId, AnemiaRecord record);
   Future<void> addDiabetesSurvey(String userId, DiabetesSurvey survey);
   Future<void> addAnemiaSurvey(String userId, AnemiaSurvey survey);
+  Future<void> addSkinCancerRecord(String userId, SkinCancerRecord record);
+  Future<void> addSkinCancerSurvey(String userId, SkinCancerSurvey survey);
   Future<void> addCombinedResult(String userId, CombinedAnalysisResult result);
+  Future<void> saveDoctorFeedback(String patientId, String timestamp, String feedback);
   Future<UserModel?> getUserData(String userId);
 }

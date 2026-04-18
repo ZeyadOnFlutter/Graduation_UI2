@@ -116,10 +116,37 @@ class FirebaseAuthDataSourceImpl implements FirebaseAuthDataSource {
   }
 
   @override
+  Future<void> addSkinCancerRecord(String userId, SkinCancerRecord record) async {
+    await _collectionForRole('patient').doc(userId).update({
+      'skinCancerRecords': FieldValue.arrayUnion([record.toJson()]),
+    });
+  }
+
+  @override
+  Future<void> addSkinCancerSurvey(String userId, SkinCancerSurvey survey) async {
+    await _collectionForRole('patient').doc(userId).update({
+      'skinCancerSurveys': FieldValue.arrayUnion([survey.toJson()]),
+    });
+  }
+
+  @override
   Future<void> addCombinedResult(String userId, CombinedAnalysisResult result) async {
     await _collectionForRole('patient').doc(userId).update({
       'combinedResults': FieldValue.arrayUnion([result.toJson()]),
     });
+  }
+
+  @override
+  Future<void> saveDoctorFeedback(String patientId, String timestamp, String feedback) async {
+    final doc = await _collectionForRole('patient').doc(patientId).get();
+    if (!doc.exists) return;
+    final results = List<Map<String, dynamic>>.from(
+      (doc.data()!.toJson()['combinedResults'] as List? ?? []).map((e) => Map<String, dynamic>.from(e)),
+    );
+    final index = results.indexWhere((r) => r['timestamp'] == timestamp);
+    if (index == -1) return;
+    results[index]['doctorFeedback'] = feedback;
+    await _collectionForRole('patient').doc(patientId).update({'combinedResults': results});
   }
 
   @override

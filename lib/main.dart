@@ -10,6 +10,7 @@ import 'package:path_provider/path_provider.dart';
 import 'core/app_bloc_observer.dart';
 import 'core/service/service_locator.dart';
 import 'features/admin/view/admin_dashboard.dart';
+import 'features/ai/view/doctor_dashboard.dart';
 import 'features/ai/view/medical_nav_bar.dart';
 import 'features/ai/viewmodel/prediction_cubit.dart';
 import 'features/auth/domain/entities/user_entity.dart';
@@ -30,6 +31,13 @@ Future<void> main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   Bloc.observer = AppBlocObserver();
   setupLocator();
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+      statusBarBrightness: Brightness.dark,
+    ),
+  );
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).then(
     (value) => runApp(
       MultiBlocProvider(
@@ -74,6 +82,7 @@ class HealAi extends StatelessWidget {
               if (state is Authenticated) {
                 return switch (state.user.role) {
                   UserRole.admin => const AdminDashboard(),
+                  UserRole.doctor => const DoctorDashboard(),
                   _ => const MedicalNavBar(),
                 };
               }

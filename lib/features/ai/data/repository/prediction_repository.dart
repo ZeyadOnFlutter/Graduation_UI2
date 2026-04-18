@@ -6,7 +6,6 @@ import '../../../../core/error/exception.dart';
 import '../../../../core/error/faliure.dart';
 import '../../../auth/data/data_source/firebase_data_source/firebase_auth_data_source.dart';
 import '../../../auth/data/models/user_model.dart';
-import '../../../auth/data/models/user_model.dart';
 import '../data_source/prediction_remote_data_source.dart';
 import '../model/prediction_response.dart';
 import '../model/health_data_model.dart';
@@ -107,6 +106,16 @@ class PredictionRepository {
   ) async {
     try {
       final response = await _dataSource.predictSkinCancerImage(imageFile);
+      final userId = _auth.currentUser?.uid;
+      if (userId != null) {
+        final record = SkinCancerRecord(
+          imageUrl: imageUrl,
+          predictedClass: response.prediction,
+          confidence: response.probability,
+          timestamp: DateTime.now(),
+        );
+        await _firebaseDataSource.addSkinCancerRecord(userId, record);
+      }
       return Right(response);
     } on RemoteException catch (e) {
       return Left(Failure(e.message));
@@ -118,6 +127,16 @@ class PredictionRepository {
   ) async {
     try {
       final response = await _dataSource.predictSkinCancerSurvey(surveyData);
+      final userId = _auth.currentUser?.uid;
+      if (userId != null) {
+        final survey = SkinCancerSurvey(
+          riskLevel: response.prediction,
+          riskScore: response.probability,
+          timestamp: DateTime.now(),
+          surveyData: surveyData,
+        );
+        await _firebaseDataSource.addSkinCancerSurvey(userId, survey);
+      }
       return Right(response);
     } on RemoteException catch (e) {
       return Left(Failure(e.message));
@@ -135,6 +154,10 @@ class PredictionRepository {
 
   Future<void> saveCombinedResult({
     required String disease,
+    required String textDescription,
+    required Map<String, dynamic> imageRecord,
+    required Map<String, dynamic> surveyRecord,
+    required Map<String, dynamic> nlpRecord,
     required double finalScore,
     required double imgScore,
     required double surveyScore,
@@ -146,6 +169,10 @@ class PredictionRepository {
       userId,
       CombinedAnalysisResult(
         disease: disease,
+        textDescription: textDescription,
+        imageRecord: imageRecord,
+        surveyRecord: surveyRecord,
+        nlpRecord: nlpRecord,
         finalScore: finalScore,
         imgScore: imgScore,
         surveyScore: surveyScore,

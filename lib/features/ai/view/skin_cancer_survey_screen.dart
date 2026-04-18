@@ -20,6 +20,8 @@ class _SkinCancerSurveyScreenState extends State<SkinCancerSurveyScreen> {
 
   // Q1
   int _age = 30;
+  // Q1b
+  String _skinTone = 'Fair';
   // Q2
   String _hairColor = 'Black';
   // Q3
@@ -44,7 +46,9 @@ class _SkinCancerSurveyScreenState extends State<SkinCancerSurveyScreen> {
   String _dailySunExposure = 'Less than 1 hour';
   // Q13
   String _outdoorWork = 'Rarely';
-  // Q14
+  // Q14 (sunscreen)
+  String _useSunscreen = 'Rarely';
+  // Q15 (tanning bed)
   String _tanningBed = 'Never';
   // Q15
   String _yearsTanningBed = 'Never used';
@@ -76,6 +80,7 @@ class _SkinCancerSurveyScreenState extends State<SkinCancerSurveyScreen> {
   void _submitForm() {
     _predictionCubit.predictSkinCancerSurvey({
       'age': _age,
+      'skin_tone': _skinTone,
       'natural_hair_color': _hairColor,
       'freckles': _freckles,
       'number_of_moles': _numberOfMoles,
@@ -88,6 +93,7 @@ class _SkinCancerSurveyScreenState extends State<SkinCancerSurveyScreen> {
       'severe_blistering_sunburns_ever': _severeSunburn,
       'daily_sun_exposure_hours': _dailySunExposure,
       'outdoor_work_or_recreation': _outdoorWork,
+      'use_of_sunscreen': _useSunscreen,
       'use_of_tanning_bed': _tanningBed,
       'years_of_tanning_bed_use': _yearsTanningBed,
       'personal_history_skin_cancer': _personalHistory,
@@ -365,6 +371,12 @@ class _SkinCancerSurveyScreenState extends State<SkinCancerSurveyScreen> {
                     _dropdown('2. What is your natural hair color?', _hairColor,
                       ['Black', 'Red', 'Blonde', 'Light Brown', 'Dark Brown'],
                       (v) => _hairColor = v),
+                    SizedBox(height: 10.h),
+
+                    // Q1b Skin tone
+                    _dropdown('Skin Tone', _skinTone,
+                      ['Very Fair', 'Fair', 'Olive', 'Brown', 'Dark'],
+                      (v) => _skinTone = v),
                     SizedBox(height: 24.h),
 
                     // ── Physical Traits ───────────────────────────
@@ -442,9 +454,15 @@ class _SkinCancerSurveyScreenState extends State<SkinCancerSurveyScreen> {
                       (v) => _outdoorWork = v),
                     SizedBox(height: 24.h),
 
-                    // ── Tanning Bed ───────────────────────────────
-                    _section('Tanning Bed Use', Icons.light_mode_rounded),
+                    // ── Protection ────────────────────────────────
+                    _section('Protection', Icons.shield_rounded),
                     SizedBox(height: 12.h),
+
+                    // Sunscreen
+                    _dropdown('How often do you use sunscreen?', _useSunscreen,
+                      ['Always (SPF 30+)', 'Usually (SPF 15-29)', 'Sometimes', 'Rarely', 'Never'],
+                      (v) => _useSunscreen = v),
+                    SizedBox(height: 10.h),
 
                     // Q14
                     _dropdown('14. How often do you use a tanning bed?', _tanningBed,

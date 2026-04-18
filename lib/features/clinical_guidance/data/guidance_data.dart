@@ -1,40 +1,40 @@
 class GuidanceData {
   static const Map<String, String> anemiaGuidance = {
-    'title': 'Anemia — WHO Lifestyle Recommendations',
+    'title': 'Anemia',
+    'icon': '🩸',
+    'overview':
+        'Anemia occurs when you don\'t have enough healthy red blood cells to carry adequate oxygen to your body\'s tissues. The most common type is iron-deficiency anemia.',
     'diet':
-        '''WHO emphasizes that a healthy, diverse diet is central to preventing and managing anaemia, especially iron-deficiency anaemia:
-
-• Eat iron-rich foods such as lean meats, fish, poultry, legumes (lentils, beans), and dark green leafy vegetables.
-
-• Boost iron absorption by eating foods rich in vitamin C (e.g., citrus fruits, peppers, fresh vegetables) alongside iron-rich foods.
-
-• Avoid eating iron blockers at the same time as iron-rich foods — substances like tea, coffee, cocoa, and high-bran cereals can reduce iron absorption.
-
-• Use food-based approaches that promote adequate intake of other important nutrients like folate, vitamin B12, and vitamin A, which are needed for healthy red blood cell production.''',
-    'lifestyle': '''WHO highlights practical daily actions for anaemia prevention:
-
-• Follow food hygiene and infection prevention practices (e.g., handwashing with soap and clean water) to reduce infections that can contribute to anaemia.
-
-• Follow local malaria prevention guidance in malaria-endemic areas to reduce one major cause of anaemia.''',
+        '• Eat iron-rich foods: lean meats, fish, poultry, legumes (lentils, beans), and dark green leafy vegetables.\n\n• Boost iron absorption by pairing iron-rich foods with vitamin C sources (citrus fruits, peppers, tomatoes).\n\n• Avoid tea, coffee, and cocoa alongside iron-rich meals — they reduce iron absorption.\n\n• Include folate-rich foods: leafy greens, fortified cereals, and citrus fruits.\n\n• Ensure adequate vitamin B12 intake through meat, dairy, and eggs.',
+    'lifestyle':
+        '• Practice good food hygiene and handwashing to reduce infections that worsen anemia.\n\n• Follow malaria prevention guidance in endemic areas.\n\n• Get regular blood tests to monitor hemoglobin levels.\n\n• Avoid excessive physical exertion when symptoms are severe.\n\n• Consult a doctor before taking iron supplements — excess iron can be harmful.',
+    'symptoms':
+        '• Fatigue and weakness\n• Pale or yellowish skin\n• Irregular heartbeat\n• Shortness of breath\n• Dizziness or lightheadedness\n• Chest pain\n• Cold hands and feet\n• Headaches',
   };
 
   static const Map<String, String> diabetesGuidance = {
-    'title': 'Diabetes — WHO Lifestyle/Healthy Living Recommendations',
-    'diet': '''WHO recommends a diet that:
+    'title': 'Diabetes',
+    'icon': '🔬',
+    'overview':
+        'Diabetes is a chronic condition that affects how your body turns food into energy. With type 2 diabetes, your body doesn\'t use insulin well. Lifestyle changes can significantly improve outcomes.',
+    'diet':
+        '• Choose whole grains over refined carbohydrates (brown rice, whole wheat bread, oats).\n\n• Eat plenty of non-starchy vegetables: leafy greens, broccoli, peppers, and cucumbers.\n\n• Limit sugary drinks, sweets, and processed snacks.\n\n• Include healthy fats: avocado, nuts, olive oil.\n\n• Eat regular, balanced meals to maintain stable blood sugar levels.\n\n• Monitor portion sizes, especially for carbohydrate-rich foods.',
+    'lifestyle':
+        '• At least 150 minutes per week of moderate-intensity physical activity (brisk walking, swimming, cycling).\n\n• Maintain a healthy body weight — even a 5–10% weight loss can significantly improve blood sugar control.\n\n• Monitor blood glucose levels regularly as advised by your doctor.\n\n• Avoid tobacco use — it worsens insulin resistance and cardiovascular risk.\n\n• Manage stress through relaxation techniques, adequate sleep, and social support.',
+    'symptoms':
+        '• Increased thirst and frequent urination\n• Unexplained weight loss\n• Extreme fatigue\n• Blurred vision\n• Slow-healing sores\n• Frequent infections\n• Tingling or numbness in hands/feet\n• Darkened skin in body creases',
+  };
 
-• Supports maintaining a healthy body weight key to diabetes prevention.
-
-• Includes nutritious whole foods and avoids excessive sugars and saturated fats (e.g., sugary drinks, sweets, processed snacks).
-
-• Basic WHO healthy-diet principles (applied to diabetes) include eating plenty of fruit, vegetables, legumes, whole grains, and healthy fats while limiting free sugars and salt.''',
-    'lifestyle': '''WHO recommends:
-
-• At least 150 minutes per week of moderate-intensity physical activity (such as brisk walking, swimming, cycling).
-
-• Staying physically active helps improve glycaemic control, insulin sensitivity, and overall cardiovascular health.
-
-• Keeping a healthy body weight lowers the risk of developing type 2 diabetes or helps improve control if diabetes is present.
-
-• Avoiding tobacco use benefits overall health and reduces the risk of complications associated with diabetes.''',
+  static const Map<String, String> skinCancerGuidance = {
+    'title': 'Skin Cancer',
+    'icon': '🔆',
+    'overview':
+        'Skin cancer is the abnormal growth of skin cells, most often developing on skin exposed to the sun. Early detection is critical — most skin cancers are highly treatable when caught early.',
+    'diet':
+        '• Eat antioxidant-rich foods: berries, leafy greens, carrots, and tomatoes help protect skin cells.\n\n• Include omega-3 fatty acids (salmon, walnuts, flaxseed) which have anti-inflammatory properties.\n\n• Stay well hydrated — adequate water intake supports healthy skin.\n\n• Limit alcohol consumption, which is associated with increased skin cancer risk.\n\n• Ensure adequate vitamin D through safe sun exposure or diet (fatty fish, fortified foods).',
+    'lifestyle':
+        '• Apply broad-spectrum SPF 30+ sunscreen daily, even on cloudy days.\n\n• Seek shade between 10 AM and 4 PM when UV rays are strongest.\n\n• Wear protective clothing: long sleeves, wide-brimmed hats, and UV-blocking sunglasses.\n\n• Avoid tanning beds and sunlamps entirely.\n\n• Perform monthly self-skin exams — check for new or changing moles.\n\n• Get annual professional skin checks, especially if you have a family history.\n\n• Follow the ABCDE rule: Asymmetry, Border, Color, Diameter, Evolving.',
+    'symptoms':
+        '• A new growth or sore that doesn\'t heal\n• A mole that changes in size, shape, or color\n• A spot that looks different from others (ugly duckling sign)\n• Pearly or waxy bump on skin\n• Flat, flesh-colored or brown scar-like lesion\n• Bleeding or oozing from a skin lesion\n• Itching, tenderness, or pain in a skin area',
   };
 }

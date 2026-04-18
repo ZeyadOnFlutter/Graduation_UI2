@@ -18,12 +18,17 @@ class StepHeader extends StatelessWidget {
           height: 28.w,
           decoration: BoxDecoration(color: color, shape: BoxShape.circle),
           child: Center(
-            child: Text(step,
-                style: TextStyle(color: Colors.white, fontSize: 13.sp, fontWeight: FontWeight.bold)),
+            child: Text(
+              step,
+              style: TextStyle(color: Colors.white, fontSize: 13.sp, fontWeight: FontWeight.bold),
+            ),
           ),
         ),
         SizedBox(width: 10.w),
-        Text(title, style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold)),
+        Text(
+          title,
+          style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
+        ),
       ],
     );
   }
@@ -64,11 +69,14 @@ class AnalysisImagePicker extends StatelessWidget {
                   height: 150.h,
                   color: Colors.grey.shade100,
                   child: Center(
-                      child: Icon(Icons.image_rounded, size: 40.sp, color: Colors.grey.shade400)),
+                    child: Icon(Icons.image_rounded, size: 40.sp, color: Colors.grey.shade400),
+                  ),
                 ),
               ),
               Positioned(
-                bottom: 0, left: 0, right: 0,
+                bottom: 0,
+                left: 0,
+                right: 0,
                 child: Container(
                   padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 12.w),
                   decoration: BoxDecoration(
@@ -78,8 +86,14 @@ class AnalysisImagePicker extends StatelessWidget {
                       colors: [Colors.black.withOpacity(0.55), Colors.transparent],
                     ),
                   ),
-                  child: Text('Sample Reference',
-                      style: TextStyle(color: Colors.white, fontSize: 11.sp, fontWeight: FontWeight.w600)),
+                  child: Text(
+                    'Sample Reference',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 11.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -100,7 +114,13 @@ class AnalysisImagePicker extends StatelessWidget {
                 width: 1.8,
               ),
               boxShadow: image != null
-                  ? [BoxShadow(color: color.withOpacity(0.18), blurRadius: 12, offset: const Offset(0, 4))]
+                  ? [
+                      BoxShadow(
+                        color: color.withOpacity(0.18),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ]
                   : [],
             ),
             child: image != null
@@ -112,7 +132,9 @@ class AnalysisImagePicker extends StatelessWidget {
                         child: Image.file(image!, fit: BoxFit.cover),
                       ),
                       Positioned(
-                        bottom: 0, left: 0, right: 0,
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
                         child: Container(
                           height: 50.h,
                           decoration: BoxDecoration(
@@ -155,11 +177,19 @@ class AnalysisImagePicker extends StatelessWidget {
                         child: Icon(Icons.add_photo_alternate_rounded, size: 30.sp, color: color),
                       ),
                       SizedBox(height: 10.h),
-                      Text('Upload Your Image',
-                          style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w600, color: color)),
+                      Text(
+                        'Upload Your Image',
+                        style: TextStyle(
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.w600,
+                          color: color,
+                        ),
+                      ),
                       SizedBox(height: 4.h),
-                      Text('Tap to browse gallery',
-                          style: TextStyle(fontSize: 11.sp, color: Colors.grey.shade500)),
+                      Text(
+                        'Tap to browse gallery',
+                        style: TextStyle(fontSize: 11.sp, color: Colors.grey.shade500),
+                      ),
                     ],
                   ),
           ),
@@ -197,7 +227,12 @@ class _ActionButton extends StatelessWidget {
   final Color color;
   final VoidCallback onTap;
 
-  const _ActionButton({required this.icon, required this.label, required this.color, required this.onTap});
+  const _ActionButton({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -214,8 +249,10 @@ class _ActionButton extends StatelessWidget {
             children: [
               Icon(icon, size: 16.sp, color: color),
               SizedBox(width: 6.w),
-              Text(label,
-                  style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w600, color: color)),
+              Text(
+                label,
+                style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w600, color: color),
+              ),
             ],
           ),
         ),

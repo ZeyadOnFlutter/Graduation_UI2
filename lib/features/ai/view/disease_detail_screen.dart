@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../data/model/text_prediction_response.dart';
 import 'anemia_detail_screen.dart';
 import 'diabetes_detail_screen.dart';
+import 'skin_cancer_detail_screen.dart';
 
 class DiseaseDetailScreen extends StatelessWidget {
   final TextPredictionResponse response;
@@ -69,7 +70,8 @@ class DiseaseDetailScreen extends StatelessWidget {
   }
 
   Widget _buildDiseaseCard(BuildContext context, DiseaseResult result) {
-    final color = result.disease.toLowerCase() == 'anemia' ? Colors.red : Colors.blue;
+    final d = result.disease.toLowerCase();
+    final color = d == 'anemia' ? Colors.red : d == 'skincancer' ? Colors.brown : Colors.blue;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -86,6 +88,11 @@ class DiseaseDetailScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => DiabetesDetailScreen(detail: detail)),
+              );
+            } else if (result.disease.toLowerCase() == 'skincancer') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SkinCancerDetailScreen(detail: detail)),
               );
             }
           }

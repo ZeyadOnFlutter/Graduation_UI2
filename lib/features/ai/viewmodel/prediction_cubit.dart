@@ -123,30 +123,89 @@ class PredictionCubit extends Cubit<PredictionState> {
       final nlpResp = await nlpFuture;
 
       double imgScore = 0;
+      Map<String, dynamic> imageRecord = {};
       imgResp.fold((f) => throw Exception(f.message), (r) {
-        // For both diseases: probability is already the risk (0-1), scale to 0-100
         imgScore = r.probability * 100;
+        // Mirror exact fields saved separately per disease
+        if (disease == 'Anemia') {
+          imageRecord = {
+            'imageUrl': imageFile.path,
+            'anemiaStatus': r.prediction,
+            'hbValue': r.probability,
+            'timestamp': DateTime.now().toIso8601String(),
+          };
+        } else if (disease == 'Skin Cancer') {
+          imageRecord = {
+            'imageUrl': imageFile.path,
+            'predictedClass': r.prediction,
+            'confidence': r.probability,
+            'timestamp': DateTime.now().toIso8601String(),
+          };
+        } else {
+          // Diabetes
+          imageRecord = {
+            'imageUrl': imageFile.path,
+            'prediction': r.prediction,
+            'probabilityNonDiabetes': r.probability,
+            'timestamp': DateTime.now().toIso8601String(),
+          };
+        }
       });
 
       double surveyScore = 0;
+      Map<String, dynamic> surveyRecord = {};
       surveyResp.fold((f) => throw Exception(f.message), (r) {
         surveyScore = r.probability * 100;
+        // Mirror exact fields saved separately per disease
+        if (disease == 'Anemia') {
+          surveyRecord = {
+            'prediction': r.prediction,
+            'anemiaProbability': r.probability,
+            'surveyData': surveyData,
+            'timestamp': DateTime.now().toIso8601String(),
+          };
+        } else if (disease == 'Skin Cancer') {
+          surveyRecord = {
+            'riskLevel': r.prediction,
+            'riskScore': r.probability,
+            'surveyData': surveyData,
+            'timestamp': DateTime.now().toIso8601String(),
+          };
+        } else {
+          // Diabetes
+          surveyRecord = {
+            'diabetes': r.prediction,
+            'probability': r.probability,
+            'surveyData': surveyData,
+            'timestamp': DateTime.now().toIso8601String(),
+          };
+        }
       });
 
       double nlpScore = 0;
+      Map<String, dynamic> nlpRecord = {};
       nlpResp.fold((f) => throw Exception(f.message), (r) {
-        // Case-insensitive key lookup
+        final normalized = disease.toLowerCase().replaceAll(' ', '');
         final key = r.resultsMap.keys.firstWhere(
-          (k) => k.toLowerCase() == disease.toLowerCase(),
+          (k) => k.toLowerCase().replaceAll(' ', '') == normalized,
           orElse: () => '',
         );
         nlpScore = key.isNotEmpty ? (r.resultsMap[key]?.percentage ?? 0.0) : 0.0;
+        nlpRecord = {
+          'text': r.text,
+          'matched_symptoms': key.isNotEmpty ? (r.resultsMap[key]?.matchedSymptoms ?? []) : [],
+          'percentage': nlpScore,
+        };
       });
 
       final finalScore = (imgScore * 0.60) + (surveyScore * 0.30) + (nlpScore * 0.10);
 
       await _repository.saveCombinedResult(
         disease: disease,
+        textDescription: symptomText,
+        imageRecord: imageRecord,
+        surveyRecord: surveyRecord,
+        nlpRecord: nlpRecord,
         finalScore: finalScore.clamp(0, 100),
         imgScore: imgScore.clamp(0, 100),
         surveyScore: surveyScore.clamp(0, 100),

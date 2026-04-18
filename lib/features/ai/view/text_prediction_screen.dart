@@ -6,6 +6,7 @@ import '../viewmodel/prediction_state.dart';
 import 'disease_detail_screen.dart';
 import 'anemia_detail_screen.dart';
 import 'diabetes_detail_screen.dart';
+import 'skin_cancer_detail_screen.dart';
 
 class TextPredictionScreen extends StatefulWidget {
   final String? filterDisease;
@@ -44,14 +45,22 @@ class _TextPredictionScreenState extends State<TextPredictionScreen> {
           listener: (context, state) {
             if (state is TextPredictionSuccess) {
               if (widget.filterDisease != null) {
-                final detail = state.response.resultsMap[widget.filterDisease!.toLowerCase()];
+                final normalized = widget.filterDisease!.toLowerCase().replaceAll(' ', '');
+                final key = state.response.resultsMap.keys.firstWhere(
+                  (k) => k.toLowerCase().replaceAll(' ', '') == normalized,
+                  orElse: () => '',
+                );
+                final detail = key.isNotEmpty ? state.response.resultsMap[key] : null;
                 if (detail != null) {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => widget.filterDisease!.toLowerCase() == 'anemia'
-                          ? AnemiaDetailScreen(detail: detail)
-                          : DiabetesDetailScreen(detail: detail),
+                      builder: (context) {
+                        final fd = normalized;
+                        if (fd == 'anemia') return AnemiaDetailScreen(detail: detail!);
+                        if (fd == 'skincancer') return SkinCancerDetailScreen(detail: detail!);
+                        return DiabetesDetailScreen(detail: detail!);
+                      },
                     ),
                   );
                 } else {
