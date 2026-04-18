@@ -6,6 +6,10 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/service/service_locator.dart';
 import '../../../../core/utils/validator.dart';
+import '../../../admin/view/admin_dashboard.dart';
+import '../../../ai/view/doctor_dashboard.dart';
+import '../../../ai/view/medical_nav_bar.dart';
+import '../../domain/entities/user_entity.dart';
 import '../cubit/auth_hydrated_cubit.dart';
 import '../cubit/auth_state.dart';
 import 'regsiter.dart';
@@ -57,12 +61,25 @@ class _LoginState extends State<Login> {
         if (state is AuthLoading) {
           _showLoading();
         } else if (state is AuthError) {
-          Navigator.of(context).popUntil((r) => r.isFirst);
+          if (Navigator.of(context, rootNavigator: true).canPop()) {
+            Navigator.of(context, rootNavigator: true).pop();
+          }
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(state.message), backgroundColor: Colors.red),
           );
         } else if (state is Authenticated) {
-          Navigator.of(context).popUntil((r) => r.isFirst);
+          if (Navigator.of(context, rootNavigator: true).canPop()) {
+            Navigator.of(context, rootNavigator: true).pop();
+          }
+          final destination = switch (state.user.role) {
+            UserRole.admin  => const AdminDashboard(),
+            UserRole.doctor => const DoctorDashboard(),
+            _               => const MedicalNavBar(),
+          };
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (_) => destination),
+            (r) => false,
+          );
         }
       },
       child: Scaffold(

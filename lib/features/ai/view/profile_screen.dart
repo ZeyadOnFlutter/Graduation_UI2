@@ -5,17 +5,26 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../features/auth/domain/entities/user_entity.dart';
 import '../../../features/auth/presentation/cubit/auth_hydrated_cubit.dart';
 import '../../../features/auth/presentation/cubit/auth_state.dart';
+import '../../auth/presentation/view/login.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AuthCubit, AuthState>(
-      builder: (context, state) {
-        final user = state is Authenticated ? state.user : null;
-
-        return Scaffold(
+    return BlocListener<AuthCubit, AuthState>(
+      listener: (context, state) {
+        if (state is Unauthenticated) {
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (_) => const Login()),
+            (r) => false,
+          );
+        }
+      },
+      child: BlocBuilder<AuthCubit, AuthState>(
+        builder: (context, state) {
+          final user = state is Authenticated ? state.user : null;
+          return Scaffold(
           backgroundColor: const Color(0xFFF8FAFC),
           body: Column(
             children: [
@@ -143,7 +152,8 @@ class ProfileScreen extends StatelessWidget {
             ],
           ),
         );
-      },
+        },
+      ),
     );
   }
 
