@@ -4,6 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../core/service/service_locator.dart';
 import '../../auth/presentation/cubit/auth_hydrated_cubit.dart';
+import '../../auth/presentation/cubit/auth_state.dart';
+import '../../auth/presentation/view/login.dart';
 import '../viewmodel/admin_cubit.dart';
 import '../viewmodel/admin_state.dart';
 import '../widgets/user_form_dialog.dart';
@@ -98,7 +100,15 @@ class _AdminDashboardViewState extends State<_AdminDashboardView> {
       actions: [
         IconButton(
           icon: Icon(Icons.logout_rounded, color: Colors.white54, size: 22.sp),
-          onPressed: () => context.read<AuthCubit>().logout(),
+          onPressed: () async {
+            await context.read<AuthCubit>().logout();
+            if (context.mounted) {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (_) => const Login()),
+                (r) => false,
+              );
+            }
+          },
         ),
         SizedBox(width: 4.w),
       ],

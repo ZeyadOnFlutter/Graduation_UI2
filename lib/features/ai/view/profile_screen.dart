@@ -12,16 +12,7 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<AuthCubit, AuthState>(
-      listener: (context, state) {
-        if (state is Unauthenticated) {
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (_) => const Login()),
-            (r) => false,
-          );
-        }
-      },
-      child: BlocBuilder<AuthCubit, AuthState>(
+    return BlocBuilder<AuthCubit, AuthState>(
         builder: (context, state) {
           final user = state is Authenticated ? state.user : null;
           return Scaffold(
@@ -153,8 +144,7 @@ class ProfileScreen extends StatelessWidget {
           ),
         );
         },
-      ),
-    );
+      );
   }
 
   void _confirmLogout(BuildContext context) {
@@ -186,9 +176,15 @@ class ProfileScreen extends StatelessWidget {
             child: Text('Cancel', style: TextStyle(color: Colors.grey, fontSize: 14.sp)),
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(context);
-              context.read<AuthCubit>().logout();
+              await context.read<AuthCubit>().logout();
+              if (context.mounted) {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (_) => const Login()),
+                  (r) => false,
+                );
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,

@@ -8,6 +8,8 @@ import '../../../core/service/service_locator.dart';
 import '../../auth/data/data_source/firebase_data_source/firebase_auth_data_source.dart';
 import '../../auth/data/models/user_model.dart';
 import '../../auth/presentation/cubit/auth_hydrated_cubit.dart';
+import '../../auth/presentation/cubit/auth_state.dart';
+import '../../auth/presentation/view/login.dart';
 
 class DoctorDashboard extends StatefulWidget {
   const DoctorDashboard({super.key});
@@ -45,50 +47,50 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
     return Scaffold(
       backgroundColor: const Color(0xFF0A0E1A),
       appBar: _buildAppBar(context),
-      body: Column(
-        children: [
-          _buildSearchBar(),
-          Expanded(
-            child: FutureBuilder<List<UserModel>>(
-              future: _future,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator(color: Color(0xFF00E5FF)));
-                }
-                final patients = (snapshot.data ?? []).where((p) {
-                  if (_search.isEmpty) return true;
-                  return p.name.toLowerCase().contains(_search.toLowerCase()) ||
-                      p.email.toLowerCase().contains(_search.toLowerCase());
-                }).toList();
+        body: Column(
+          children: [
+            _buildSearchBar(),
+            Expanded(
+              child: FutureBuilder<List<UserModel>>(
+                future: _future,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator(color: Color(0xFF00E5FF)));
+                  }
+                  final patients = (snapshot.data ?? []).where((p) {
+                    if (_search.isEmpty) return true;
+                    return p.name.toLowerCase().contains(_search.toLowerCase()) ||
+                        p.email.toLowerCase().contains(_search.toLowerCase());
+                  }).toList();
 
-                if (patients.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.people_outline_rounded, color: Colors.white24, size: 52.sp),
-                        SizedBox(height: 12.h),
-                        Text('No patients found', style: TextStyle(color: Colors.white38, fontSize: 14.sp)),
-                      ],
+                  if (patients.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.people_outline_rounded, color: Colors.white24, size: 52.sp),
+                          SizedBox(height: 12.h),
+                          Text('No patients found', style: TextStyle(color: Colors.white38, fontSize: 14.sp)),
+                        ],
+                      ),
+                    );
+                  }
+
+                  return ListView.separated(
+                    padding: EdgeInsets.all(16.w),
+                    itemCount: patients.length,
+                    separatorBuilder: (_, __) => SizedBox(height: 10.h),
+                    itemBuilder: (_, i) => _PatientTile(
+                      patient: patients[i],
+                      dataSource: _dataSource,
+                      onFeedbackSaved: _reload,
                     ),
                   );
-                }
-
-                return ListView.separated(
-                  padding: EdgeInsets.all(16.w),
-                  itemCount: patients.length,
-                  separatorBuilder: (_, __) => SizedBox(height: 10.h),
-                  itemBuilder: (_, i) => _PatientTile(
-                    patient: patients[i],
-                    dataSource: _dataSource,
-                    onFeedbackSaved: _reload,
-                  ),
-                );
-              },
+                },
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
     );
   }
 
@@ -123,7 +125,15 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
         ),
         IconButton(
           icon: Icon(Icons.logout_rounded, color: Colors.white54, size: 22.sp),
-          onPressed: () => context.read<AuthCubit>().logout(),
+          onPressed: () async {
+            await context.read<AuthCubit>().logout();
+            if (context.mounted) {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (_) => const Login()),
+                (r) => false,
+              );
+            }
+          },
         ),
         SizedBox(width: 4.w),
       ],
